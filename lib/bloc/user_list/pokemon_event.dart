@@ -1,13 +1,14 @@
-part of 'pokemon_bloc.dart';
+// user_list_event.dart
+import 'package:equatable/equatable.dart';
 
-abstract class PokemonEvent extends Equatable {
-  const PokemonEvent();
+abstract class PokemonListEvent extends Equatable {
+  const PokemonListEvent();
 
   @override
-  List<Object?> get props => [];
+  List<Object> get props => [];
 }
 
-class GetPokemonList extends PokemonEvent {
+class GetPokemonList extends PokemonListEvent {
   final int pageKey;
 
   const GetPokemonList({
@@ -15,5 +16,5 @@ class GetPokemonList extends PokemonEvent {
   });
 
   @override
-  List<Object?> get props => [pageKey];
+  List<Object> get props => [pageKey];
 }

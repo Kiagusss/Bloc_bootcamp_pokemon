@@ -1,53 +1,84 @@
-import 'package:coba_api_flutter/all_pokemon_api.dart';
-import 'package:coba_api_flutter/api_model.dart';
-import 'package:dio/dio.dart';
+class PokemonListResponse {
+  int? count;
+  String? next;
+  String? previous;
+  List<Pokemon>? pokemon;
 
-class ApiService {
-  final Dio _dio = Dio();
+  PokemonListResponse({this.count, this.next, this.previous, this.pokemon});
 
-  Future<Pokemon> getPokemon(String pokemonName) async {
-    try {
-      final response =
-          await _dio.get('https://pokeapi.co/api/v2/pokemon/$pokemonName');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = response.data;
-        return Pokemon.fromJson(data);
-      } else {
-        throw Exception('Failed to load data');
+  PokemonListResponse.fromJson(Map<String, dynamic> json) {
+
+    try{
+      count = json['count'];
+      next = json['next'];
+      previous = json['previous'];
+      if(json['results'] == null) pokemon = [];
+      if (json['results'] != null) {
+        pokemon = <Pokemon>[];
+        json['results'].forEach((v) {
+          pokemon!.add(new Pokemon.fromJson(v));
+        });
       }
-    } catch (e) {
-      throw Exception('Error: $e');
+    }catch(e){
+      throw e;
     }
   }
 
-  Future<AllPokemon> getAllPokemon(int limit) async {
-    try {
-      final response =
-          await _dio.get('https://pokeapi.co/api/v2/pokemon?limit=$limit');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = response.data;
-        return AllPokemon.fromJson(data);
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['count'] = this.count;
+    data['next'] = this.next;
+    data['previous'] = this.previous;
+    if (this.pokemon != null) {
+      data['pokemon'] = this.pokemon!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class PokemonList {
+  bool? isLastPage;
+  List<Pokemon>? pokemons;
+
+  PokemonList({this.isLastPage, this.pokemons});
+
+  PokemonList.fromJson(Map<String, dynamic> json) {
+    isLastPage = json['is_last_page'];
+    if (json['result'] != null) {
+      pokemons = <Pokemon>[];
+      json['results'].forEach((v) {
+        pokemons!.add(new Pokemon.fromJson(v));
+      });
     }
   }
 
-  Future<List<Pokemon>> searchPokemon(String query) async {
-    try {
-      final response =
-          await _dio.get('https://pokeapi.co/api/v2/pokemon/$query');
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['results'];
-        return List<Pokemon>.from(data.map((x) => Pokemon.fromJson(x)));
-      } else {
-        throw Exception('Failed to search Pokemon');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['is_last_page'] = isLastPage;
+    if (this.pokemons != null) {
+      data['pokemon'] = this.pokemons!.map((v) => v.toJson()).toList();
     }
+    return data;
   }
-  
+}
+
+class Pokemon {
+  String? name;
+  String? url;
+  String? image;
+
+  Pokemon({this.name, this.url});
+
+  Pokemon.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    url = json['url'];
+    image = "https://img.pokemondb.net/sprites/sword-shield/icon/${json['name']}.png";
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['url'] = this.url;
+    return data;
+  }
 }

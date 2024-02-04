@@ -1,36 +1,52 @@
-part of 'pokemon_bloc.dart';
+import 'package:coba_api_flutter/all_pokemon_api.dart';
+import 'package:equatable/equatable.dart';
 
-
-
-abstract class PokemonState extends Equatable {
-  const PokemonState();
+abstract class PokemonListState extends Equatable {
+  const PokemonListState();
 
   @override
-  List<Object?> get props => [];
+  List<Object> get props => [];
 }
 
-class PokemonInitial extends PokemonState {}
+class PokemonListEmpty extends PokemonListState {}
 
-class PokemonLoading extends PokemonState {}
+class PokemonListInitial extends PokemonListState {}
 
-class PokemonLoaded extends PokemonState {
-  final AllPokemon pokemonList;
+class PokemonListLoading extends PokemonListState {}
 
-  const PokemonLoaded({
-    required this.pokemonList,
+class PokemonListLoaded extends PokemonListState {
+  final PokemonList data;
+  final int nextPageKey;
+
+  const PokemonListLoaded({
+    required this.data,
+    required this.nextPageKey,
   });
 
   @override
-  List<Object?> get props => [pokemonList];
+  List<Object> get props => [data, nextPageKey];
 }
 
-class PokemonError extends PokemonState {
+class PokemonListLastPageLoaded extends PokemonListState {
+  final PokemonList data;
+
+  const PokemonListLastPageLoaded({
+    required this.data,
+  });
+
+  @override
+  List<Object> get props => [data];
+}
+
+class PokemonListError extends PokemonListState {
   final String message;
+  final int code;
 
-  const PokemonError({
+  const PokemonListError({
     required this.message,
+    required this.code
   });
 
   @override
-  List<Object?> get props => [message];
+  List<Object> get props => [message, code];
 }

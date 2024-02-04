@@ -1,31 +1,40 @@
-import 'dart:async';
-import 'package:bloc/bloc.dart';
-import 'package:coba_api_flutter/all_pokemon_api.dart';
-import 'package:coba_api_flutter/api_provider.dart';
+import 'package:coba_api_flutter/bloc/user_list/pokemon_event.dart';
+import 'package:coba_api_flutter/bloc/user_list/pokemon_state.dart';
+import 'package:coba_api_flutter/repositories/app_repositories.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:equatable/equatable.dart';
+class PokemonListBloc extends Bloc<PokemonListEvent, PokemonListState> {
+  final AppRepository repository;
 
-part 'pokemon_event.dart';
-part 'pokemon_state.dart';
+  static const int _pageLimit = 20;
 
-class PokemonBloc extends Bloc<PokemonEvent, PokemonState> {
-  final ApiService apiService;
+  PokemonListBloc({
+    required this.repository,
+  }) : super(PokemonListLoading()) {
 
-  PokemonBloc({
-    required this.apiService,
-  }) : super(PokemonInitial()) {
     on<GetPokemonList>((event, emit) async {
       try {
-        emit(PokemonLoading());
-        final pokemonList = await apiService.getAllPokemon(event.pageKey);
-        emit(PokemonLoaded(pokemonList: pokemonList));
-      } catch (error) {
-        emit(PokemonError(message: 'Error fetching Pokemon list: $error'));
+        //await Future.delayed(const Duration(seconds: 5));
+        emit(PokemonListLoading());
+        final data = await repository.getContentPokemonList(
+          event.pageKey,
+          false,
+          _pageLimit,
+        );
+        final isLastPage = data.isLastPage;
+        if (isLastPage!) {
+          emit(PokemonListLastPageLoaded(data: data));
+        } else {
+          final nextPageKey = event.pageKey + 1;
+          emit(PokemonListLoaded(data: data, nextPageKey: nextPageKey));
+        }
+      } on Exception catch (e, stackTrace) {
+        debugPrint(stackTrace.toString());
+        emit(PokemonListError(code: 100, message: "Error Gua Nggak Tau Dimana! - KOMPUTER ANDA!"));
+      } catch (e, stackTrace) {
+        debugPrint(stackTrace.toString());
       }
     });
-  }
-
-  Future<void> searchPokemon(String query) async {
-    // Implement search logic here
   }
 }

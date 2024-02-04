@@ -1,7 +1,12 @@
+import 'package:coba_api_flutter/bloc/user_list/pokemon_bloc.dart';
 import 'package:coba_api_flutter/coba_api.dart';
+import 'package:coba_api_flutter/data/app_service.dart';
+import 'package:coba_api_flutter/data/local_service.dart';
+import 'package:coba_api_flutter/repositories/app_repositories.dart';
 import 'package:coba_api_flutter/tugas_tampilan.dart';
 import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:math_expressions/math_expressions.dart';
 
 void main() {
@@ -13,8 +18,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: CalculatorApp(),
+    return BlocProvider<PokemonListBloc>(
+      create: (BuildContext context) => PokemonListBloc(
+        repository: AppRepository(
+            appService: AppService(), localService: LocalService()),
+      ),
+      child: const MaterialApp(
+        home: HomePage(),
+      ),
     );
   }
 }
@@ -30,7 +41,7 @@ class CalculatorApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home:  AllPokemonApi(),
+      home: const HomePage(),
     );
   }
 }

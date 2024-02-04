@@ -1,20 +1,26 @@
-class AllPokemon {
+class PokemonListResponse {
   int? count;
   String? next;
-  Null? previous;
-  List<Results>? results;
+  String? previous;
+  List<Pokemon>? pokemon;
 
-  AllPokemon({this.count, this.next, this.previous, this.results});
+  PokemonListResponse({this.count, this.next, this.previous, this.pokemon});
 
-  AllPokemon.fromJson(Map<String, dynamic> json) {
-    count = json['count'];
-    next = json['next'];
-    previous = json['previous'];
-    if (json['results'] != null) {
-      results = <Results>[];
-      json['results'].forEach((v) {
-        results!.add(new Results.fromJson(v));
-      });
+  PokemonListResponse.fromJson(Map<String, dynamic> json) {
+
+    try{
+      count = json['count'];
+      next = json['next'];
+      previous = json['previous'];
+      if(json['results'] == null) pokemon = [];
+      if (json['results'] != null) {
+        pokemon = <Pokemon>[];
+        json['results'].forEach((v) {
+          pokemon!.add(new Pokemon.fromJson(v));
+        });
+      }
+    }catch(e){
+      throw e;
     }
   }
 
@@ -23,22 +29,50 @@ class AllPokemon {
     data['count'] = this.count;
     data['next'] = this.next;
     data['previous'] = this.previous;
-    if (this.results != null) {
-      data['results'] = this.results!.map((v) => v.toJson()).toList();
+    if (this.pokemon != null) {
+      data['pokemon'] = this.pokemon!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
-class Results {
+class PokemonList {
+  bool? isLastPage;
+  List<Pokemon>? pokemons;
+
+  PokemonList({this.isLastPage, this.pokemons});
+
+  PokemonList.fromJson(Map<String, dynamic> json) {
+    isLastPage = json['is_last_page'];
+    if (json['result'] != null) {
+      pokemons = <Pokemon>[];
+      json['results'].forEach((v) {
+        pokemons!.add(new Pokemon.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['is_last_page'] = isLastPage;
+    if (this.pokemons != null) {
+      data['pokemon'] = this.pokemons!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Pokemon {
   String? name;
   String? url;
+  String? image;
 
-  Results({this.name, this.url});
+  Pokemon({this.name, this.url});
 
-  Results.fromJson(Map<String, dynamic> json) {
+  Pokemon.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     url = json['url'];
+    image = "https://img.pokemondb.net/sprites/sword-shield/icon/${json['name']}.png";
   }
 
   Map<String, dynamic> toJson() {
